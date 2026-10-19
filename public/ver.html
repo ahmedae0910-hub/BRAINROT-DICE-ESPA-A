@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ver historial · Brainrot Dice España</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🎲%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Rajdhani:wght@500;700&family=Luckiest+Guy&display=swap">
+<link rel="stylesheet" href="estilos.css">
+</head>
+<body class="th-azul pg-azul">
+<div class="w">
+<div class="logo" role="img" aria-label="Brainrot Dice España">
+<div class="lg1"><span class="lw">BRAINROT</span> <span class="lr">DICE</span></div>
+<div class="lg2"><span class="ly">ESPAÑA</span><svg class="flag" viewBox="0 0 60 40" aria-hidden="true"><rect width="60" height="40" rx="5" fill="#aa151b"/><rect y="10" width="60" height="20" fill="#f1bf00"/><rect x="13" y="14" width="9" height="12" rx="2.5" fill="#aa151b" opacity=".85"/><rect x=".75" y=".75" width="58.5" height="38.5" rx="4.5" fill="none" stroke="#1a1a2e" stroke-width="1.5"/></svg></div>
+</div>
+<div class="hd"><span class="av avd" id="hem">🎲</span><img class="av" id="hav" alt="Perfil" hidden><h1 id="htitle">VER HISTORIAL</h1></div>
+<div class="card">
+<strong>👁 Ver historial</strong>
+<p class="mu">Escribe el código que te han pasado para ver las tiradas en directo.</p>
+<div class="vrow"><input id="vin" maxlength="24" placeholder="ID (ej. voSDwj7EMk)" autocomplete="off" spellcheck="false" autocapitalize="off" style="text-transform:none"><button class="go" id="vs">Buscar</button></div>
+<div class="det" id="vm2"></div>
+</div>
+<div id="vres" hidden>
+<div class="card" id="stage">
+<div class="row"><strong>Última tirada</strong><span class="lb" id="vd"></span></div>
+<div class="tray" id="tray"></div>
+<div class="res" id="res"></div>
+<div class="det" id="det"></div>
+<div class="tl" id="tl"></div>
+<div class="sigl">🔒 <span id="vsig">········</span> · ✓ firmado por el servidor</div>
+<div class="idl">ID: <b id="vid">…</b></div>
+</div>
+<div class="card"><div class="stat" id="vst"></div></div>
+<div class="card" id="histcard">
+<div class="row"><strong>Historial completo</strong><span class="lb" id="vn"></span></div>
+<ol id="hist"></ol>
+</div>
+</div>
+<footer>Brainrot Dice España</footer>
+</div>
+<script src="common.js"></script>
+<script src="extras.js"></script>
+<script>
+(()=>{"use strict";
+const $=id=>document.getElementById(id);
+let es=null,H=[],rolls=0,score=0,anim=false,q=[];
+function vt(t){const r=document.documentElement.style;["ac","acd","bd","bg","card","pg"].forEach(k=>{r.removeProperty("--v"+k);const x=t&&t[k];if(typeof x==="string"&&/^(#[0-9a-fA-F]{6}|rgba?\([0-9., ]+\))$/.test(x))r.setProperty("--v"+k,x)})}
+function brand(v){const r=document.documentElement.style;let on=false;
+if(v&&/^\/vipimg\/[a-f0-9]{8}-(av|bg)\.jpg$/.test(v.av)&&/^\/vipimg\/[a-f0-9]{8}-(av|bg)\.jpg$/.test(v.bg)){on=true;r.setProperty("--img","url("+v.bg+")");$("hav").src=v.av;$("htitle").textContent="VER HISTORIAL · "+String(v.name).toUpperCase()}
+else{r.removeProperty("--img");$("htitle").textContent="VER HISTORIAL"}
+vt(on?v.theme:null);$("hav").hidden=!on;$("hem").hidden=on;const t=on?"kikoxx":"azul";document.body.className="th-"+t+" pg-"+t;$("stage").className="card th-"+t;$("histcard").className="card th-"+t}
+function stats(){const box=$("vst");box.replaceChildren();
+[[rolls,"Tiradas totales"],[score,"Marcador"],[H.length,"Tiradas guardadas"]].forEach(([n,l])=>{const c=document.createElement("div"),b=document.createElement("b"),s=document.createElement("span");b.textContent=String(n);s.textContent=l;c.append(b,s);box.append(c)})}
+function showLast(){const e=H[0],tr=$("tray");
+if(!e){tr.replaceChildren();$("res").textContent="Aún no hay tiradas";$("det").textContent="";$("tl").replaceChildren();$("vd").textContent="";return}
+KX.draw(tr,e.v,false,e.t);KX.show(e,$("res"),$("det"),$("tl"));$("vd").textContent=e.ts?new Date(e.ts).toLocaleTimeString("es"):""}
+function render(){stats();KX.renderHist($("hist"),H);$("vn").textContent=H.length+" tiradas"}
+function next(){if(anim||!q.length)return;const m=q.shift();anim=true;
+$("res").textContent="Tirando…";$("det").textContent="";$("tl").replaceChildren();
+KX.spin($("tray"),m.entry.v.length,m.entry.t,()=>{H.unshift(m.entry);H=H.slice(0,200);rolls=m.rolls;score=m.score;anim=false;showLast();render();next()})}
+function ok(e){return e&&["color","4","6","8","10","12","20"].includes(e.t)&&Array.isArray(e.v)&&e.v.length>0&&e.v.length<=100&&e.v.every(x=>Number.isInteger(x)&&x>=1&&x<=(e.t==="color"?6:+e.t))}
+async function open(){const m=$("vm2");if(es){es.close();es=null}q=[];anim=false;$("vres").hidden=true;
+let raw=$("vin").value.replace(/[^A-Za-z0-9]/g,""),want="";if(raw.length===18){want=raw.slice(10).toUpperCase();raw=raw.slice(0,10)}
+if(raw.length!==10){m.textContent="ID no válido. Son 10 letras y números, por ejemplo voSDwj7EMk.";return}
+m.textContent="Buscando…";
+try{const r=await fetch("/api/session/"+raw);if(!r.ok){m.textContent="Código no encontrado.";return}}catch(e){m.textContent="No se pudo conectar con el servidor.";return}
+es=new EventSource("/api/live/"+raw);
+es.addEventListener("snap",e=>{const d=JSON.parse(e.data);
+if(want&&want!==d.sig){es.close();es=null;m.textContent="⚠ La firma no coincide con la del servidor. Revisa que has copiado bien el código.";return}
+H=(d.hist||[]).filter(ok);rolls=d.rolls|0;score=d.score|0;q=[];brand(d.vip);$("vsig").textContent=d.sig||"········";$("vid").textContent=raw;showLast();render();$("vres").hidden=false;m.textContent="Verificado ✔ · en directo"});
+es.addEventListener("roll",e=>{const d=JSON.parse(e.data);if(ok(d.entry)){q.push(d);next()}});
+es.addEventListener("score",e=>{score=JSON.parse(e.data).score|0;stats()});
+es.onerror=()=>{m.textContent="Reconectando…"}}
+$("vs").onclick=open;$("vin").onkeydown=e=>{if(e.key==="Enter")open()};
+const c=new URLSearchParams(location.search).get("c");if(c){$("vin").value=c;open()}
+})();
+</script>
+</body>
+</html>

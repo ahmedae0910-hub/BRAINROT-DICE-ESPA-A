@@ -1,0 +1,3 @@
+Si quieres un sonido de dados propio, pon aqui un archivo llamado roll.mp3
+(de tu propiedad o libre de derechos). La pagina lo usara solo al tirar los dados.
+Si no hay archivo, usa el sonido que genera ella misma.

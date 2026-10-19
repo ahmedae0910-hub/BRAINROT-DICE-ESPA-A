@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Admin VIP</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🎲%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Rajdhani:wght@500;700&display=swap">
+<link rel="stylesheet" href="estilos.css">
+</head>
+<body class="th-azul pg-azul">
+<div class="w">
+<div class="hd"><span class="av avd">🎲</span><h1>ADMIN VIP</h1></div>
+<div class="card">
+<strong>🔑 Clave de administrador</strong>
+<div class="vrow" style="margin-top:10px"><input id="key" type="password" placeholder="Tu ADMIN_KEY" autocomplete="off" style="text-transform:none"><button class="go" id="ent">Entrar</button></div>
+<div class="det" id="m0"></div>
+</div>
+<div id="panel" hidden>
+<div class="card">
+<strong>➕ Nuevo VIP</strong>
+<p class="mu">Pon el nombre y la foto de la persona. Se usará como foto de perfil y como fondo de pantalla de su sala.</p>
+<div class="vrow"><input id="nm" maxlength="24" placeholder="Nombre" autocomplete="off" style="text-transform:none"><input id="ph" type="file" accept="image/*"></div>
+<input id="tt" maxlength="40" placeholder="TikTok (opcional): @usuario" autocomplete="off" style="text-transform:none;margin-top:8px;width:100%;font-size:1rem;padding:10px;border-radius:10px;border:2px solid var(--bd);background:var(--bg);color:var(--tx);font-family:inherit">
+<button class="go" id="mk" style="margin-top:12px">Crear código VIP</button>
+<div class="det" id="m1"></div>
+<div class="code" id="nc" hidden></div>
+</div>
+<div class="card"><strong>⭐ VIPs creados</strong><ol id="vl"></ol></div>
+</div>
+</div>
+<script>
+(()=>{"use strict";
+const $=id=>document.getElementById(id);
+let key="";
+const fmt=c=>"VIP-"+c.slice(0,4)+"-"+c.slice(4,8);
+async function post(path,body){const r=await fetch(path,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(Object.assign({key:key},body||{}))});if(!r.ok)throw new Error(r.status);return r.json()}
+function h2r(h,s,l){const a=s*Math.min(l,1-l),f=n=>{const k=(n+h/30)%12;return l-a*Math.max(-1,Math.min(k-3,9-k,1))};return[f(0),f(8),f(4)].map(x=>Math.round(x*255))}
+const hx=(h,s,l)=>"#"+h2r(h,s,l).map(x=>x.toString(16).padStart(2,"0")).join("");
+function domTheme(file){return new Promise(ok=>{const im=new Image(),u=URL.createObjectURL(file);
+im.onerror=()=>ok(null);
+im.onload=()=>{const c=document.createElement("canvas");c.width=c.height=32;const x=c.getContext("2d");x.drawImage(im,0,0,32,32);URL.revokeObjectURL(u);
+const d=x.getImageData(0,0,32,32).data,bins=new Array(12).fill(0);
+for(let i=0;i<d.length;i+=4){const r=d[i]/255,g=d[i+1]/255,b=d[i+2]/255,mx=Math.max(r,g,b),mn=Math.min(r,g,b),df=mx-mn,s=mx?df/mx:0;if(s<.35||mx<.3)continue;
+let h=mx===r?((g-b)/df)%6:mx===g?(b-r)/df+2:(r-g)/df+4;h=(h*60+360)%360;bins[Math.floor(h/30)%12]+=s*mx}
+let k=0;for(let i=1;i<12;i++)if(bins[i]>bins[k])k=i;const h=bins[k]===0?260:k*30+15,c2=h2r(h,.5,.08);
+ok({ac:hx(h,.7,.52),acd:hx(h,.75,.26),bd:hx(h,.45,.3),bg:hx(h,.45,.1),pg:hx(h,.55,.07),card:"rgba("+c2.join(",")+",.86)"})}
+im.src=u})}
+function toJpeg(file,max,square){return new Promise((ok,err)=>{const img=new Image(),u=URL.createObjectURL(file);
+img.onload=()=>{const w=img.width,h=img.height;let sx=0,sy=0,sw=w,sh=h,cw,ch;
+if(square){const m=Math.min(w,h);sx=(w-m)/2;sy=(h-m)/2;sw=sh=m;cw=ch=max}else{const k=Math.min(1,max/Math.max(w,h));cw=Math.round(w*k);ch=Math.round(h*k)}
+const c=document.createElement("canvas");c.width=cw;c.height=ch;c.getContext("2d").drawImage(img,sx,sy,sw,sh,0,0,cw,ch);URL.revokeObjectURL(u);ok(c.toDataURL("image/jpeg",.78).split(",")[1])};
+img.onerror=()=>err(new Error("img"));img.src=u})}
+async function list(){const d=await post("/api/admin/list");const ol=$("vl");ol.replaceChildren();
+if(!d.vips.length){const li=document.createElement("li");li.className="none";li.textContent="Aún no hay VIPs.";ol.append(li);return}
+d.vips.forEach(v=>{const li=document.createElement("li"),im=document.createElement("img"),nm=document.createElement("span"),cd=document.createElement("span"),cp=document.createElement("button"),dl=document.createElement("button");
+im.className="vl-av";im.src=v.av;im.alt="";nm.className="nm";nm.textContent=v.name;cd.className="lb";cd.textContent=fmt(v.code);
+cp.className=dl.className="btn";cp.textContent="Copiar";dl.textContent="Borrar";
+cp.onclick=async()=>{try{await navigator.clipboard.writeText(fmt(v.code));cp.textContent="¡Copiado!"}catch(e){}};
+dl.onclick=async()=>{if(!confirm("¿Borrar a "+v.name+"? Su código dejará de funcionar."))return;try{await post("/api/admin/delete",{code:v.code});list()}catch(e){}};
+li.append(im,nm,cd,cp,dl);ol.append(li)})}
+$("ent").onclick=async()=>{key=$("key").value;$("m0").textContent="Comprobando…";
+try{await list();$("panel").hidden=false;$("m0").textContent="Dentro ✔"}catch(e){key="";$("m0").textContent="Clave incorrecta o servidor sin ADMIN_KEY configurada."}};
+$("key").onkeydown=e=>{if(e.key==="Enter")$("ent").click()};
+$("mk").onclick=async()=>{const name=$("nm").value.trim(),f=$("ph").files[0],m=$("m1");$("nc").hidden=true;
+if(!name||!f){m.textContent="Pon un nombre y elige una foto.";return}
+m.textContent="Creando…";$("mk").disabled=true;
+try{const av=await toJpeg(f,128,true),bg=await toJpeg(f,960,false);
+const th=await domTheme(f);const d=await post("/api/admin/create",{name:name,av:av,bg:bg,tiktok:$("tt").value,theme:th});
+$("nc").textContent=fmt(d.code);$("nc").hidden=false;m.textContent="Listo. Pásale este código a "+name+".";$("nm").value="";$("ph").value="";list()}
+catch(e){m.textContent="No se pudo crear. Prueba con otra foto."}
+finally{$("mk").disabled=false}};
+})();
+</script>
+</body>
+</html>

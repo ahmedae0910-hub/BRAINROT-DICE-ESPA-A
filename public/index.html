@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Brainrot Dice España</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🎲%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Rajdhani:wght@500;700&family=Luckiest+Guy&display=swap">
+<link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+<button class="vipbtn" id="vipb" aria-label="Sala VIP" title="Sala VIP"><span>👑</span></button>
+<div class="modal" id="vipm" hidden><div class="card">
+<div class="row"><strong>⭐ Sala VIP</strong><button class="btn" id="vipx">Cerrar</button></div>
+<div id="viplogin"><p class="mu">Escribe tu código VIP para entrar a tu sala.</p>
+<div class="vrow"><input id="vipin" maxlength="20" placeholder="VIP-XXXX-XXXX" autocomplete="off" spellcheck="false" autocapitalize="characters"><button class="go" id="vipgo">Entrar</button></div>
+<div class="det" id="vipmsg"></div></div>
+<div id="vipout" hidden><p class="mu" id="vipwho"></p><button class="go" id="vipexit">Salir de la sala VIP</button></div>
+</div></div>
+<div class="w">
+
+
+<div class="logo" role="img" aria-label="Brainrot Dice España">
+<div class="lg1"><span class="lw">BRAINROT</span> <span class="lr">DICE</span></div>
+<div class="lg2"><span class="ly">ESPAÑA</span><svg class="flag" viewBox="0 0 60 40" aria-hidden="true"><rect width="60" height="40" rx="5" fill="#aa151b"/><rect y="10" width="60" height="20" fill="#f1bf00"/><rect x="13" y="14" width="9" height="12" rx="2.5" fill="#aa151b" opacity=".85"/><rect x=".75" y=".75" width="58.5" height="38.5" rx="4.5" fill="none" stroke="#1a1a2e" stroke-width="1.5"/></svg></div>
+</div>
+<div class="layout">
+<aside class="card" id="streamers"></aside>
+<div class="maincol">
+<div class="card">
+<div class="ctl">
+<label>Cantidad<select id="n"></select></label>
+<label>Tipo de dado<select id="t">
+<option value="color">Dados de colores</option><option value="4">4 caras (d4)</option><option value="6">6 caras (d6)</option><option value="8">8 caras (d8)</option><option value="10">10 caras (d10)</option><option value="12">12 caras (d12)</option><option value="20">20 caras (d20)</option></select></label>
+<label>Tema<select id="th"></select></label>
+</div>
+<div class="lock" id="lock"></div>
+<input type="file" id="bgf" accept="image/*" hidden>
+<div class="vact"><button class="btn" id="bgb" hidden>📷 Cambiar mi fondo</button></div>
+</div>
+
+<div class="hd"><span class="av avd" id="hem">🎲</span><img class="av" id="hav" alt="Perfil" hidden><h1 id="htitle">BRAINROT DICE ESPAÑA</h1></div>
+<div class="card" id="stage">
+<div class="tray" id="tray"></div>
+<div class="res" id="res"></div>
+<div class="det" id="det"></div>
+<div class="tl" id="tl"></div>
+<div class="sigl">🔒 <span id="sigc">········</span> · ✓ firmado por el servidor</div>
+<div class="idl">ID: <b id="idv">…</b></div>
+<a class="verl" id="verl" href="/ver.html" target="_blank" rel="noopener">Verificar</a>
+<div class="vact"><button class="btn" id="vcp">Copiar ID</button><button class="btn" id="vln">Copiar enlace</button><button class="btn" id="vnw">Código nuevo</button></div>
+<div class="det" id="vmsg"></div>
+<div style="height:14px"></div>
+<button class="go" id="go">¡Tirar! <small style="font-weight:400;opacity:.8">(barra espaciadora)</small></button>
+</div>
+
+<div class="card" id="score">
+<div class="row"><strong>Marcador</strong><button class="btn" id="sr">Reiniciar</button></div>
+<div class="sc"><button class="sb" id="sm" aria-label="Restar">−</button><div class="sv" id="sv">0</div><button class="sb" id="sp" aria-label="Sumar">+</button></div>
+<div class="steps" id="steps"></div>
+</div>
+
+<div class="card" id="histcard">
+<div class="row"><strong>Historial</strong><button class="btn" id="snd">🔊 Sonido: sí</button></div>
+<ol id="hist"></ol>
+</div>
+
+<div class="card">
+<div class="stat">
+<div><b id="s1">0</b><span>Tiradas totales</span></div>
+<div><b id="s2">–</b><span>Media de la suma</span></div>
+<div><b id="s3">–</b><span>Máximo</span></div>
+<div><b id="s4">–</b><span>Mínimo</span></div>
+</div>
+</div>
+<div id="adminslot"></div>
+</div>
+</div>
+<footer>Hecho con ❤️</footer>
+</div>
+<script src="common.js"></script>
+<script src="extras.js"></script>
+<script src="adminpanel.js"></script>
+<script>
+(()=>{"use strict";
+const $=id=>document.getElementById(id);
+const TH=[["kikoxx","Kikoxx (tu foto)",0],["azul","Azul",0],["verde","Verde",0],["rojo","Rojo",0],["rosa","Rosa",0],["bn","Blanco y negro",0],["negro","Negro",0],["bronce","Bronce",10],["plata","Plata",20],["oro","Oro",30],["custom","📷 Mi fondo (subir imagen)",0]];
+const TYPES=["color","4","6","8","10","12","20"],STEPS=[1,5,10,100];
+let pr={n:4,t:"color",th:"azul",snd:true,step:1,total:0};
+try{const o=JSON.parse(localStorage.getItem("kx.prefs")||"{}");
+if(Number.isInteger(o.n)&&o.n>=1&&o.n<=100)pr.n=o.n;if(TYPES.includes(o.t))pr.t=o.t;
+if(Number.isInteger(o.total)&&o.total>=0)pr.total=o.total;
+if(TH.some(x=>x[0]===o.th&&x[2]<=pr.total))pr.th=o.th;
+pr.snd=o.snd!==false;if(STEPS.includes(o.step))pr.step=o.step}catch(e){}
+const savePr=()=>{try{localStorage.setItem("kx.prefs",JSON.stringify(pr))}catch(e){}};
+let vip=null,ses=null,H=[],rolls=0,score=0,busy=false,ac;
+async function api(url,body){const r=await fetch(url,body?{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}:undefined);if(!r.ok)throw new Error(r.status);return r.json()}
+let sfx=null;{const a=new Audio();a.preload="auto";a.addEventListener("canplaythrough",()=>{sfx=a},{once:true});a.src="/sounds/roll.mp3";try{a.load()}catch(e){}}
+function click(){if(!pr.snd)return;if(sfx){try{sfx.currentTime=0;const p=sfx.play();if(p&&p.catch)p.catch(()=>{});return}catch(e){}}synth()}
+function synth(){try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();if(ac.state==="suspended")ac.resume();
+const sr=ac.sampleRate,len=Math.floor(sr*.05),buf=ac.createBuffer(1,len,sr),d=buf.getChannelData(0);
+for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,3);
+const t0=ac.currentTime+.02,times=[];
+for(let t=0;t<1.5;t+=.035+Math.random()*.035)times.push([t,.22+Math.random()*.22]);
+[1.62,1.78,1.98,2.24,2.55,2.82].forEach((t,i)=>times.push([t,.55-i*.04]));
+times.forEach(([t,v])=>{const s=ac.createBufferSource(),f=ac.createBiquadFilter(),g=ac.createGain();s.buffer=buf;f.type="bandpass";f.frequency.value=1100+Math.random()*3200;f.Q.value=1.1;g.gain.value=v;s.connect(f);f.connect(g);g.connect(ac.destination);s.start(t0+t)});
+const o=ac.createOscillator(),g=ac.createGain();o.type="sine";o.frequency.setValueAtTime(150,t0+2.8);o.frequency.exponentialRampToValueAtTime(60,t0+3);g.gain.setValueAtTime(.35,t0+2.8);g.gain.exponentialRampToValueAtTime(.001,t0+3);o.connect(g);g.connect(ac.destination);o.start(t0+2.8);o.stop(t0+3.02)}catch(e){}}
+for(let i=1;i<=100;i++)$("n").add(new Option(i+(i===1?" dado":" dados"),i));
+function themes(){const sel=$("th");sel.replaceChildren();TH.filter(x=>x[0]!=="kikoxx"||vip).forEach(([k,l,u])=>{const lab=k==="kikoxx"&&vip?"Mi foto ("+vip.name+")":l;const o=new Option(pr.total>=u?lab:"🔒 "+lab+" ("+u+" tiradas)",k);o.disabled=pr.total<u;sel.add(o)});
+const nx=TH.find(x=>x[2]>pr.total);$("lock").textContent=nx?"Próximo tema: "+nx[1]+" en "+(nx[2]-pr.total)+" tiradas.":"¡Todos los temas desbloqueados!";sel.value=pr.th}
+let cbg=null;try{const x=localStorage.getItem("kx.bg");if(x&&/^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(x))cbg=x}catch(e){}
+function img(){const r=document.documentElement.style;if(pr.th==="custom"&&cbg)r.setProperty("--img","url("+cbg+")");else if(vip)r.setProperty("--img","url("+vip.bg+")");else r.removeProperty("--img")}
+function theme(){const t=pr.th==="custom"?"kikoxx":pr.th;document.body.className="th-"+t+" pg-"+t;$("stage").className="card th-"+t;$("histcard").className="card th-"+t;img()}
+function toJpeg(f,max){return new Promise((ok,err)=>{const im=new Image(),u=URL.createObjectURL(f);im.onload=()=>{const k=Math.min(1,max/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext("2d").drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);ok(c.toDataURL("image/jpeg",.72))};im.onerror=()=>err(new Error("img"));im.src=u})}
+function stats(){$("s1").textContent=rolls;const a=H.filter(h=>h.t!=="color").map(h=>KX.sum(h.v));
+$("s2").textContent=a.length?(a.reduce((x,y)=>x+y,0)/a.length).toFixed(1):"–";$("s3").textContent=a.length?Math.max(...a):"–";$("s4").textContent=a.length?Math.min(...a):"–";
+KX.renderHist($("hist"),H.slice(0,10));$("snd").textContent="🔊 Sonido: "+(pr.snd?"sí":"no")}
+function scoreUI(){const e=$("sv");e.textContent=String(score);e.className="sv"+(score>0?" pos":score<0?" neg":"");
+$("steps").replaceChildren(...STEPS.map(x=>{const b=document.createElement("button");b.className="stp"+(x===pr.step?" on":"");b.textContent="±"+x;b.onclick=()=>{pr.step=x;savePr();scoreUI()};return b}))}
+function pop(){const e=$("sv");e.classList.remove("pop");void e.offsetWidth;e.classList.add("pop")}
+async function bump(d){if(!ses)return;try{const r=await api("/api/score",{code:ses.code,token:ses.token,delta:d*pr.step});score=r.score;scoreUI();pop()}catch(e){$("vmsg").textContent="No se pudo actualizar el marcador."}}
+function idle(){const m=pr.t==="color"?6:+pr.t;KX.draw($("tray"),Array.from({length:pr.n},(_,i)=>(i%m)+1),false,pr.t);$("res").textContent="Pulsa «Tirar» para empezar";$("det").textContent="";$("tl").replaceChildren()}
+function roll(){if(busy||!ses)return;busy=true;const n=pr.n,t=pr.t;click();
+$("go").disabled=$("n").disabled=$("t").disabled=true;$("res").textContent="Tirando…";$("det").textContent="";$("tl").replaceChildren();
+const req=api("/api/roll",{code:ses.code,token:ses.token,type:t,n:n}).catch(()=>null);
+KX.spin($("tray"),n,t,async()=>{const d=await req;
+$("go").disabled=$("n").disabled=$("t").disabled=false;busy=false;
+if(!d){$("res").textContent="No se pudo tirar (conexión o demasiado rápido). Inténtalo otra vez.";return}
+H.unshift(d.entry);H=H.slice(0,200);rolls=d.rolls;pr.total++;savePr();
+KX.draw($("tray"),d.entry.v,true,d.entry.t);KX.show(d.entry,$("res"),$("det"),$("tl"));stats();themes()})}
+function showCode(){setTimeout(()=>{if(typeof ping==="function")ping()},500);$("idv").textContent=ses.code;$("sigc").textContent=ses.sig||"········";$("verl").href="/ver.html?c="+ses.code;$("vmsg").textContent="Conectado ✔ Las tiradas las firma y guarda el servidor."}
+const TVK=["ac","acd","bd","bg","card","pg"];
+function vtheme(){const r=document.documentElement.style;TVK.forEach(k=>r.removeProperty("--v"+k));
+if(vip&&vip.theme)TVK.forEach(k=>{const v=vip.theme[k];if(typeof v==="string"&&/^(#[0-9a-fA-F]{6}|rgba?\([0-9., ]+\))$/.test(v))r.setProperty("--v"+k,v)})}
+function brand(){
+if(vip){$("hav").src=vip.av;$("hav").hidden=false;$("hem").hidden=true;$("htitle").textContent="VIP ROOM DE "+vip.name.toUpperCase();document.title="VIP Room de "+vip.name;$("vipb").title="Sala VIP de "+vip.name}
+else{$("hav").hidden=true;$("hem").hidden=false;$("htitle").textContent="BRAINROT DICE ESPAÑA";document.title="Brainrot Dice España";$("vipb").title="Sala VIP"}
+$("vipb").classList.toggle("on",!!vip);vtheme();themes();theme();if(window.KXAdmin)KXAdmin.show(vip)}
+async function vipEnter(raw){const r=await fetch("/api/vip/enter",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({code:raw})});return r.ok?r.json():null}
+async function newSession(){const s=await api("/api/session",{vip:vip?vip.code:""});ses=s;try{sessionStorage.setItem("kx.ses",JSON.stringify(s))}catch(e){}
+H=[];rolls=0;score=0;showCode();stats();scoreUI();idle()}
+async function start(){
+try{const c=localStorage.getItem("kx.vip");if(c){const d=await vipEnter(c);if(d){vip=d;vip.code=c}else localStorage.removeItem("kx.vip")}}catch(e){}
+if((!vip&&pr.th==="kikoxx")||(pr.th==="custom"&&!cbg)){pr.th="azul";savePr()}
+brand();
+try{const old=JSON.parse(sessionStorage.getItem("kx.ses")||"null");
+if(old&&typeof old.code==="string"&&typeof old.token==="string"){const r=await fetch("/api/session/"+old.code);
+if(r.ok){const d=await r.json();if((d.vip?d.vip.id:null)!==(vip?vip.id:null))throw 0;ses=old;ses.sig=d.sig;H=d.hist;rolls=d.rolls;score=d.score;showCode();stats();scoreUI();idle();return}}}catch(e){}
+try{await newSession()}catch(e){$("idv").textContent="sin conexión";$("vmsg").textContent="No se pudo conectar con el servidor."}}
+$("n").onchange=e=>{pr.n=Math.max(1,Math.min(100,+e.target.value||1));savePr();idle()};
+$("t").onchange=e=>{if(TYPES.includes(e.target.value)){pr.t=e.target.value;savePr();idle()}};
+$("th").onchange=e=>{const k=TH.find(x=>x[0]===e.target.value);if(!k||k[2]>pr.total)return;
+if(k[0]==="custom"&&!cbg){$("bgf").click();$("th").value=pr.th;return}
+pr.th=k[0];savePr();theme();$("bgb").hidden=pr.th!=="custom"};
+$("bgb").onclick=()=>$("bgf").click();
+$("bgf").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(!f)return;
+try{const d=await toJpeg(f,1280);localStorage.setItem("kx.bg",d);cbg=d;pr.th="custom";savePr();themes();theme();$("bgb").hidden=false}
+catch(x){$("lock").textContent="No se pudo usar esa imagen. Prueba con otra."}};
+$("vipb").onclick=()=>{$("vipm").hidden=false;$("viplogin").hidden=!!vip;$("vipout").hidden=!vip;
+if(vip)$("vipwho").textContent="Estás en la sala VIP de "+vip.name+".";else{$("vipin").value="";$("vipmsg").textContent="";$("vipin").focus()}};
+$("vipexit").onclick=()=>{vip=null;try{localStorage.removeItem("kx.vip")}catch(e){}if(pr.th==="kikoxx"){pr.th="azul";savePr()}$("vipm").hidden=true;brand();newSession().catch(()=>{})};
+$("vipx").onclick=()=>{$("vipm").hidden=true};
+$("vipgo").onclick=async()=>{const raw=$("vipin").value;$("vipmsg").textContent="Comprobando…";let d=null;try{d=await vipEnter(raw)}catch(e){}
+if(!d){$("vipmsg").textContent="Código VIP no válido.";return}
+vip=d;vip.code=raw;try{localStorage.setItem("kx.vip",raw)}catch(e){}
+pr.th="kikoxx";savePr();$("vipm").hidden=true;brand();try{await newSession()}catch(e){}};
+$("vipin").onkeydown=e=>{if(e.key==="Enter")$("vipgo").click()};
+$("go").onclick=roll;$("sp").onclick=()=>bump(1);$("sm").onclick=()=>bump(-1);
+$("sr").onclick=()=>bump(-score/pr.step);
+$("snd").onclick=()=>{pr.snd=!pr.snd;savePr();stats()};
+$("vcp").onclick=async()=>{try{await navigator.clipboard.writeText(ses.code);$("vmsg").textContent="ID copiado."}catch(e){$("vmsg").textContent="Selecciona el código y cópialo a mano."}};
+$("vln").onclick=async()=>{try{await navigator.clipboard.writeText(location.origin+"/ver.html?c="+ses.code);$("vmsg").textContent="Enlace copiado."}catch(e){$("vmsg").textContent="No se pudo copiar el enlace."}};
+$("vnw").onclick=async()=>{try{await newSession()}catch(e){$("vmsg").textContent="No se pudo crear un código nuevo."}};
+document.addEventListener("keydown",e=>{if(e.code==="Space"&&!/SELECT|BUTTON|INPUT|TEXTAREA/.test(document.activeElement.tagName)){e.preventDefault();roll()}});
+themes();$("n").value=pr.n;$("t").value=pr.t;theme();$("bgb").hidden=pr.th!=="custom";stats();scoreUI();idle();start();
+const ping=()=>{if(ses&&vip)api("/api/ping",{code:ses.code,token:ses.token}).catch(()=>{})};setInterval(ping,20000);
+})();
+</script>
+</body>
+</html>
