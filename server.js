@@ -3,6 +3,7 @@ const http=require("http"),fs=require("fs"),path=require("path"),crypto=require(
 const PORT=process.env.PORT||3000,DIR=path.join(__dirname,"public");
 const DB=path.join(process.env.DATA_DIR||__dirname,"data.json");
 const ALPH="ABCDEFGHJKLMNPQRSTUVWXYZ23456789",TYPES=["color","4","6","8","10","12","20"];
+const DAY=864e5,MAX_SESSIONS=20000;
 const DATA=process.env.DATA_DIR||__dirname,VDIR=path.join(DATA,"vip"),VDB=path.join(DATA,"vips.json"),ADMIN=process.env.ADMIN_KEY||"1234";
 fs.mkdirSync(VDIR,{recursive:true});
 const MSGF=path.join(DATA,"messages.json"),NEWF=path.join(DATA,"news.json");
