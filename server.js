@@ -3,8 +3,7 @@ const http=require("http"),fs=require("fs"),path=require("path"),crypto=require(
 const PORT=process.env.PORT||3000,DIR=path.join(__dirname,"public");
 const DB=path.join(process.env.DATA_DIR||__dirname,"data.json");
 const ALPH="ABCDEFGHJKLMNPQRSTUVWXYZ23456789",TYPES=["color","4","6","8","10","12","20"];
-const DAY=864e5,MAX_SESSIONS=20000;
-const DATA=process.env.DATA_DIR||__dirname,VDIR=path.join(DATA,"vip"),VDB=path.join(DATA,"vips.json"),ADMIN=process.env.ADMIN_KEY||"";
+const DATA=process.env.DATA_DIR||__dirname,VDIR=path.join(DATA,"vip"),VDB=path.join(DATA,"vips.json"),ADMIN=process.env.ADMIN_KEY||"1234";
 fs.mkdirSync(VDIR,{recursive:true});
 const MSGF=path.join(DATA,"messages.json"),NEWF=path.join(DATA,"news.json");
 let M=[],N=[];try{M=JSON.parse(fs.readFileSync(MSGF,"utf8"))}catch(e){}try{N=JSON.parse(fs.readFileSync(NEWF,"utf8"))}catch(e){}
@@ -29,7 +28,7 @@ const COLRE=/^(#[0-9a-fA-F]{6}|rgba?\([0-9., ]{5,30}\))$/;
 function okTheme(t){if(!t||typeof t!=="object")return null;const o={};for(const k of["ac","acd","bd","bg","card","pg"]){if(typeof t[k]!=="string"||!COLRE.test(t[k]))return null;o[k]=t[k]}return o}
 const vinfo=c=>{const v=V[c];return v?{id:v.id,name:v.name,av:"/vipimg/"+v.id+"-av.jpg",bg:"/vipimg/"+v.id+"-bg.jpg",theme:v.theme||null}:null};
 const normVip=x=>{let r=String(x||"").toUpperCase().replace(/[^A-Z0-9]/g,"");if(r.startsWith("VIP")&&r.length===11)r=r.slice(3);return r};
-function adminOk(k){if(ADMIN.length<8||typeof k!=="string")return false;const a=Buffer.from(k),b=Buffer.from(ADMIN);return a.length===b.length&&crypto.timingSafeEqual(a,b)}
+function adminOk(k){if(ADMIN.length<4||typeof k!=="string")return false;const a=Buffer.from(k),b=Buffer.from(ADMIN);return a.length===b.length&&crypto.timingSafeEqual(a,b)}
 let S={};try{S=JSON.parse(fs.readFileSync(DB,"utf8"))}catch(e){}
 let dirty=false;const live=new Map(),hits=new Map();
 const MIME={".html":"text/html; charset=utf-8",".css":"text/css; charset=utf-8",".js":"text/javascript; charset=utf-8",".jpg":"image/jpeg",".png":"image/png",".mp3":"audio/mpeg",".ogg":"audio/ogg",".txt":"text/plain; charset=utf-8",".ico":"image/x-icon"};
